@@ -72,7 +72,8 @@ class Building(Entity):
         self.fire_decrement = 0.0
         self.build_delta = 0.0
         self.is_frozen = False
-
+        self.fire_start_count = 0  # 记录起火次数
+        self.fire_extinguished_count = 0  # 记录灭火次数
         self.fire_dec_set = set()
         self.build_delta_set = set()
 
@@ -97,6 +98,7 @@ class Building(Entity):
         self.fire_strength = 1.0
         self.time_to_next_fire = self.my_fire_start_rate
         self.time_since_last_fire = 0
+        self.fire_start_count += 1  # 起火次数加 1
 
     def step(self):
         info = {'fires_extinguished': 0,
@@ -109,6 +111,7 @@ class Building(Entity):
             if B_ID in self.fire_dec_set and G_ID in self.fire_dec_set:
                 self.fire_decrement += self.game_config['generalist_help_factor'] * self.game_config['fire_reduce_rate']
             new_fire = self.fire_strength - self.fire_decrement
+
         prev_fire = self.fire_strength
         self.fire_strength = min(1.0, max(0.0, new_fire))
         if F_ID in self.build_delta_set and G_ID in self.build_delta_set:
@@ -130,6 +133,10 @@ class Building(Entity):
         if prev_health > 0.0 and self.health == 0.0:
             info['buildings_burned'] += 1
             self.fire_strength = 0.0
+
+        if prev_fire > 0.0 and self.fire_strength == 0.0:
+            info['fires_extinguished'] += 1
+            self.fire_extinguished_count += 1  # 灭火次数加 1
 
         if len(self.fire_dec_set) > 0:
             info['types_per_firefight'] = len(self.fire_dec_set)
@@ -775,6 +782,15 @@ class FireFightersEnv(MultiAgentEnv):
 
         if done:
             info["prop_buildings_completed"] = sum(b.complete for b in self.buildings) / len(self.buildings)
+
+            total_fire_start = sum(b.fire_start_count for b in self.buildings)
+            total_fire_extinguished = sum(b.fire_extinguished_count for b in self.buildings)
+            if total_fire_start == 0:
+                fire_extinguish_ratio = 1.0  # 若没有起火，默认扑灭比为 1
+            else:
+                fire_extinguish_ratio = total_fire_extinguished / total_fire_start
+            info["fire_extinguish_ratio"] = fire_extinguish_ratio  # 添加火灾扑灭比到 info 字典
+
             info["solved"] = int(all(b.complete for b in self.buildings))
             if info["solved"] == 1:
                 total_reward += self.reward_config['solved']

@@ -185,5 +185,13 @@ scenarios = {
                                 test_ratio=0.15, train_pct_range=(0.75, 1.0)),
     'single_scen': partial(generate_single_scen_dict,
                            agent_list=['F', 'F', 'F', 'B', 'B', 'B', 'G', 'G'],
-                           building_list=['F', 'F', 'F', 'F', 'S', 'S', 'S', 'S'])
+                           building_list=['F', 'F', 'F', 'F', 'S', 'S', 'S', 'S']),
+    'complex_scen-30a-24b': partial(generate_single_scen_dict,
+                           agent_list=['F', 'F', 'F','F', 'F', 'F','F', 'F','F', 'F', 'F', 'B', 'B', 'B', 'B', 'B', 'B','B', 'B', 'B','B', 'B', 'G', 'G', 'G', 'G','G', 'G', 'G', 'G'],
+                           building_list=['F', 'F', 'F', 'F', 'S', 'S', 'S', 'S','F', 'F', 'F', 'F', 'S', 'S', 'S', 'S','F', 'F', 'F', 'F', 'S', 'S', 'S', 'S'], bld_spacing=3),
+    'complex_scen-30a-16b': partial(generate_single_scen_dict,
+                           agent_list=['F', 'F', 'F','F', 'F', 'F','F', 'F','F', 'F', 'F', 'B', 'B', 'B', 'B', 'B', 'B','B', 'B', 'B','B', 'B', 'G', 'G', 'G', 'G','G', 'G', 'G', 'G'],
+                           building_list=['F', 'F', 'F', 'F', 'S', 'S', 'S', 'S','F', 'F', 'F', 'F', 'S', 'S', 'S', 'S','F'], bld_spacing=3),
+
+
 }
